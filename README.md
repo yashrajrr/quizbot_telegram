@@ -31,7 +31,7 @@ You can try the bot out here: [Quiz Telegram Bot](https://t.me/quizz_do_bot)
 4. Run the bot script:
 
    ```bash
-   python quiz_bot.py
+   python main.py
    ```
 
 5. Start the bot on Telegram by searching for your bot's username or clicking the link provided by BotFather.
@@ -49,13 +49,9 @@ This bot is hosted on [PythonAnywhere](https://www.pythonanywhere.com/), allowin
 
 ## File Structure
 
-- `quiz_bot.py`: Main script that runs the bot and handles all logic.
-- `requirements.txt`: A file containing the necessary dependencies (if needed).
+- `main.py`: Main script that runs the bot and handles all logic.
 
 ## License
 
 This project is open-source and available under the [MIT License](LICENSE).
 
----
-
-With this update, the bot link is clearly highlighted, and the hosting information via PythonAnywhere is included for easy access.
