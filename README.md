@@ -1,8 +1,3 @@
-# quizbot_telegram
-Here's the updated README with the information included so that users can directly try out the bot:
-
----
-
 # Quiz Telegram Bot
 
 This is a simple Telegram bot that allows users to participate in a quiz game. The bot asks multiple-choice questions and awards points for correct answers. Users can start the quiz, answer questions, and track their score.
