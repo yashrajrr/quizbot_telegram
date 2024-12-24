@@ -3,6 +3,8 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import random
 from flask import Flask, request
+import os
+import requests
 
 # Bot configuration
 TOKEN: Final = '6911599717:AAFtGu8AMC8hBj83hxyYDzzVnYucT72EIHs'
@@ -92,7 +94,17 @@ def handle_webhook():
 def health_check():
     return "I'm alive!"
 
+# Set the webhook for the bot after the app starts
+def set_webhook():
+    url = f'https://api.telegram.org/bot{TOKEN}/setWebhook?url={WEBHOOK_URL}'
+    response = requests.get(url)
+    if response.status_code == 200:
+        print('Webhook successfully set!')
+    else:
+        print(f'Failed to set webhook. Status code: {response.status_code}')
+
 # Run Flask app
 if __name__ == '__main__':
     print("Starting Flask app for webhook...")
+    set_webhook()  # Set the webhook when the app is launched
     app.run(host='0.0.0.0', port=5000)
