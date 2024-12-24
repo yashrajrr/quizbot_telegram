@@ -1,6 +1,6 @@
 # Quiz Telegram Bot
 
-This is a simple Telegram quiz bot built using Python and the `python-telegram-bot` library. It allows users to take a quiz with multiple-choice questions and tracks their points.
+This is a simple Telegram quiz bot built using Python and the `python-telegram-bot` library. It allows users to take a quiz with multiple-choice questions and tracks their points.You can access the bot using the url https://t.me/quizz_do_bot (make sure to run the code before using the bot).
 
 ## Features
 - Start the quiz with the `/start` command.
