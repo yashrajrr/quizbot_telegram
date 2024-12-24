@@ -1,55 +1,72 @@
 # Quiz Telegram Bot
 
-This is a simple Telegram bot that lets users participate in a quiz game. The bot asks multiple-choice questions, tracks scores, and allows users to restart the quiz.
-
-You can try the bot here: [Quiz Telegram Bot](https://t.me/quizz_do_bot)
+This is a simple Telegram quiz bot built using Python and the `python-telegram-bot` library. It allows users to take a quiz with multiple-choice questions and tracks their points.
 
 ## Features
-
-- **Start the quiz**: Use the `/start` command to begin the quiz.
-- **Answer questions**: Multiple-choice questions with options 1-4.
-- **Score tracking**: Points are awarded for correct answers, displayed after each question.
-- **Restart**: Users can restart the quiz once all questions are answered.
+- Start the quiz with the `/start` command.
+- Answer multiple-choice questions and earn points.
+- View the final score after completing the quiz.
+- Restart the quiz using the `/restart` command.
 
 ## Requirements
-
-- Python 3.7 or higher
-- Telegram API token
-- Telegram Bot username
+- Python 3.x
+- `python-telegram-bot` library (can be installed via `pip install python-telegram-bot`)
 
 ## Installation
 
-1. Clone the repository or download the script.
-2. Install required libraries:
-
-   ```bash
+1. Clone this repository or download the script.
+2. Install the required libraries:
+   ```
    pip install python-telegram-bot
    ```
-
-3. Replace the `TOKEN` and `BOT_USERNAME` in the script with your bot's credentials.
-4. Run the bot:
-
-   ```bash
-   python main.py
+3. Replace `TOKEN` in the script with your own Telegram Bot API token.
+4. Run the script:
+   ```
+   python quiz_bot.py
    ```
 
-5. Start the bot on Telegram by searching for the bot's username or using the link provided by BotFather.
+## Commands
 
-## How it Works
+### `/start`
+- Resets the user's progress and welcomes them to the quiz bot.
 
-- **/start Command**: Greets the user and provides instructions.
-- **/quiz Command**: Starts the quiz with random questions and answer options.
-- **Answering Questions**: Users select their answer by typing the corresponding number. The bot checks the answer and awards points.
-- **Completion**: Once all questions are answered, users are notified of their score and can restart the quiz.
+### `/quiz`
+- Starts the quiz by presenting the first question.
 
-## Hosting
+### `/restart`
+- Restarts the quiz and resets the user's score.
 
-The bot can be hosted on platforms like [Render](https://render.com/) or [PythonAnywhere](https://www.pythonanywhere.com/) for 24/7 access.
+## How It Works
+- The bot starts by initializing the user data and presenting the first question.
+- Each question has multiple options (shuffled) to choose from.
+- The user sends their answer as a number (1-4), and the bot checks if the answer is correct.
+- Points are awarded for each correct answer.
+- The bot continues to the next question after each answer until all questions are answered.
+- Once all questions are completed, the bot displays the total score.
 
-## File Structure
+## Example Interaction
 
-- `main.py`: The script that runs the bot and handles the quiz logic.
+1. **User**: `/start`  
+   **Bot**: "Hello, Welcome to the quiz bot. Type /quiz to start the quiz."
+
+2. **User**: `/quiz`  
+   **Bot**: "Question 1: What is the capital of France?  
+   1. Paris  
+   2. London  
+   3. Berlin  
+   4. Madrid  
+   Reply with the number of your answer."
+
+3. **User**: `1`  
+   **Bot**: "Correct answer! 🎉 You earned 10 points."
+
+4. **User**: `/restart`  
+   **Bot**: "The quiz has been restarted. Type /quiz to start again!"
 
 ## License
+This project is open source and available under the MIT License.
 
-This project is open-source and available under the [MIT License](LICENSE).
+## Acknowledgements
+- `python-telegram-bot` library for Telegram bot interaction.
+
+Enjoy the quiz!
