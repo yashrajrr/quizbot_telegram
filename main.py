@@ -85,7 +85,7 @@ tg_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, answer_questi
 
 # Flask route for webhook
 @app.route(f'/{TOKEN}', methods=['POST'])
-def handle_webhook():
+async def handle_webhook():
     tg_app.update_queue.put(request.get_json(force=True))
     return "OK"
 
@@ -93,6 +93,11 @@ def handle_webhook():
 @app.route('/health', methods=['GET'])
 def health_check():
     return "I'm alive!"
+
+# Define a route for the root URL to avoid 404 errors
+@app.route('/', methods=['GET'])
+def index():
+    return "Welcome to the Quiz Bot!"
 
 # Set the webhook for the bot after the app starts
 def set_webhook():
