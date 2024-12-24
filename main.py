@@ -1,18 +1,14 @@
+
 from typing import Final
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import random
-from flask import Flask, request
-import os
-import requests
 
-# Bot configuration
 TOKEN: Final = '6911599717:AAFtGu8AMC8hBj83hxyYDzzVnYucT72EIHs'
 BOT_USERNAME: Final = 'quizz_do_bot'
-WEBHOOK_URL = f'https://quizbot-telegram-1.onrender.com/{TOKEN}'
 
-# Data for the bot
 user_data = {}
+
 quiz_data = [
     {
         "question": "What is the capital of France?",
@@ -52,64 +48,82 @@ quiz_data = [
     }
 ]
 
-# Flask app setup
-app = Flask(__name__)
-
-# Telegram bot application
-tg_app = Application.builder().token(TOKEN).build()
-
-# Command handlers
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.message.chat_id
-    user_data[chat_id] = {"current_question_index": 0, "points": 0}
-    await update.message.reply_text('Hello! Welcome to the quiz bot. Type /quiz to start the quiz.')
+    user_data[chat_id] = {"current_question_index": 0, "points": 0}  # Reset user data
+    await update.message.reply_text('Hello, Welcome to the quiz bot. Type /quiz to start the quiz.')
 
 async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Quiz logic remains the same
-    pass
+    chat_id = update.message.chat_id
+    user = user_data.get(chat_id)
+
+    if user:
+        current_question_index = user["current_question_index"]
+        if current_question_index < len(quiz_data):
+            question_data = quiz_data[current_question_index]
+            question = question_data["question"]
+            options = question_data["options"]
+
+            random.shuffle(options)
+            user_data[chat_id]["correct_answer"] = question_data["correct_answer"]
+
+            reply_text = f"Question {current_question_index + 1}: {question}\n\n"
+            for i, option in enumerate(options):
+                reply_text += f"{i + 1}. {option}\n"
+            reply_text += "\nReply with the number of your answer."
+
+            await update.message.reply_text(reply_text)
+        else:
+            points = user["points"]
+            await update.message.reply_text(f"You have completed the quiz with a score of {points} points! 🎉\nType /restart to play again.")
+    else:
+        await update.message.reply_text("Please start the quiz with /start.")
 
 async def answer_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Answer logic remains the same
-    pass
+    chat_id = update.message.chat_id
+    user = user_data.get(chat_id)
+
+    if user:
+        current_question_index = user["current_question_index"]
+        if current_question_index < len(quiz_data):
+            try:
+                chosen_option = int(update.message.text)
+                correct_answer = user["correct_answer"]
+
+                if 1 <= chosen_option <= 4:
+                    options = quiz_data[current_question_index]["options"]
+                    if options[chosen_option - 1] == correct_answer:
+                        points = quiz_data[current_question_index]["points"]
+                        user_data[chat_id]["points"] += points
+                        await update.message.reply_text(f"Correct answer! 🎉 You earned {points} points.")
+                    else:
+                        await update.message.reply_text("Wrong answer. 😔")
+                    user_data[chat_id]["current_question_index"] += 1
+                    await quiz_command(update, context)
+                else:
+                    await update.message.reply_text("Please choose a valid option (1-4).")
+            except ValueError:
+                await update.message.reply_text("Please enter a valid number (1-4).")
+            except Exception as e:
+                await update.message.reply_text(f"An error occurred: {str(e)}")
+                print(f"Error in answer_question: {str(e)}")
+        else:
+            await update.message.reply_text("You have already completed the quiz. Type /restart to play again.")
+    else:
+        await update.message.reply_text("Please start the quiz with /start.")
 
 async def restart_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.message.chat_id
-    user_data[chat_id] = {"current_question_index": 0, "points": 0}
-    await update.message.reply_text("Quiz restarted! Type /quiz to play again.")
+    user_data[chat_id] = {"current_question_index": 0, "points": 0}  # Reset user data
+    await update.message.reply_text("The quiz has been restarted. Type /quiz to start again!")
 
-# Adding handlers
-tg_app.add_handler(CommandHandler('start', start_command))
-tg_app.add_handler(CommandHandler('quiz', quiz_command))
-tg_app.add_handler(CommandHandler('restart', restart_command))
-tg_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, answer_question))
-
-# Flask route for webhook
-@app.route(f'/{TOKEN}', methods=['POST'])
-async def handle_webhook():
-    tg_app.update_queue.put(request.get_json(force=True))
-    return "OK"
-
-# Flask route for health check
-@app.route('/health', methods=['GET'])
-def health_check():
-    return "I'm alive!"
-
-# Define a route for the root URL to avoid 404 errors
-@app.route('/', methods=['GET'])
-def index():
-    return "Welcome to the Quiz Bot!"
-
-# Set the webhook for the bot after the app starts
-def set_webhook():
-    url = f'https://api.telegram.org/bot{TOKEN}/setWebhook?url={WEBHOOK_URL}'
-    response = requests.get(url)
-    if response.status_code == 200:
-        print('Webhook successfully set!')
-    else:
-        print(f'Failed to set webhook. Status code: {response.status_code}')
-
-# Run Flask app
 if __name__ == '__main__':
-    print("Starting Flask app for webhook...")
-    set_webhook()  # Set the webhook when the app is launched
-    app.run(host='0.0.0.0', port=5000)
+    print("Starting bot...")
+    app = Application.builder().token(TOKEN).build()
+    app.add_handler(CommandHandler('start', start_command))
+    app.add_handler(CommandHandler('quiz', quiz_command))
+    app.add_handler(CommandHandler('restart', restart_command))  # Added restart handler
+    app.add_handler(MessageHandler(filters.TEXT, answer_question))
+
+    print('Polling')
+    app.run_polling(poll_interval=3)
